@@ -25,3 +25,15 @@ start_guessing_game: build_guessing_game
 	@./$(guessing_game_build_path)/main
 clean_guessing_game:
 	@rm -rf $(guessing_game_build_path)
+
+####################################################################
+# misc
+####################################################################
+misc_path = misc
+misc_build_path = $(misc_path)/$(output_path)
+build_misc:
+	@jai $(misc_path)/main.jai -output_path $(output_path)
+start_misc: build_misc
+	@./$(misc_build_path)/main
+clean_misc:
+	@rm -rf $(misc_build_path)
