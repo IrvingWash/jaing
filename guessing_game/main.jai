@@ -4,7 +4,7 @@ Posix :: #import "POSIX";
 
 State :: struct {
     target: u8;
-    attempt: u8;
+    attempt: u8 = 1;
 }
 
 main :: () {
