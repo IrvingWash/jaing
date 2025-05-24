@@ -3,6 +3,7 @@
 Simp :: #import "Simp";
 #import "Window_Creation";
 Input :: #import "Input";
+#import "Random";
 
 // Colors
 WHITE :: Vector4.{1, 1, 1, 1};
@@ -17,12 +18,12 @@ WINDOW_HEIGHT :: 600;
 Ball :: struct {
     size: float = 15;
     position: Vector2;
-    velocity: Vector2 = .{5, 5};
-    launched: bool;
+    velocity: Vector2;
+    speed: float = 5;
 }
 
 Pallet :: struct {
-    size: Vector2 = .{10, 100};
+    size: Vector2 = .{15, 100};
     position: Vector2;
     speed: float = 10;
     velocity: Vector2;
@@ -114,7 +115,7 @@ get_input :: () {
                         case xx Key.S;
                             state.pallets[1].velocity = .{0, -state.pallets[1].speed};
                         case .SPACEBAR;
-                            state.ball.launched = true;
+                            launch_ball();
                     }
                 } else {
                     if event.key_code == {
@@ -200,10 +201,6 @@ move_pallets :: () {
 }
 
 move_ball :: () {
-    if !state.ball.launched {
-        return;
-    }
-
     // Collide with walls
     hit_top_wall := state.ball.position.y >= WINDOW_HEIGHT;
     hit_bottom_wall := state.ball.position.y <= 0;
@@ -226,6 +223,15 @@ update_score :: () {
     if test_ball_against_right_wall() {
         state.pallets[0].score += 1;
     }
+}
+
+launch_ball :: () {
+    random_seed(current_time_monotonic().low);
+
+    state.ball.velocity = .{
+        state.ball.speed * ifx random_get_zero_to_one() > 0.5 then -1 else 1,
+        state.ball.speed * ifx random_get_zero_to_one() > 0.5 then -1 else 1,
+    };
 }
 
 test_ball_against_left_wall :: () -> bool {
