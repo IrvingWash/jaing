@@ -22,9 +22,9 @@ Ball :: struct {
 }
 
 Pallet :: struct {
-    size: Vector2 = .{10, 75};
+    size: Vector2 = .{10, 100};
     position: Vector2;
-    velocity: Vector2 = .{0, 100};
+    velocity: Vector2 = .{0, 3000};
 }
 
 // State
@@ -157,11 +157,11 @@ render :: () {
 }
 
 move_pallet :: (pallet: *Pallet, direction: Direction) {
-    if direction == .Up {
+    if direction == .Up && pallet.position.y <= WINDOW_HEIGHT - pallet.size.y {
         pallet.position += pallet.velocity * DELTA_TIME;
     }
 
-    if direction == .Down {
+    if direction == .Down && pallet.position.y >= 0 {
         pallet.position -= pallet.velocity * DELTA_TIME;
     }
 }
