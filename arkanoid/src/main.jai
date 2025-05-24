@@ -1,5 +1,10 @@
-#import "Basic";
+#import "Basic"()(MEMORY_DEBUGGER = true);
+Game :: #import,dir "game";
 
 main :: () {
-    print("Hello, Sailor!");
+    Game.init();
+
+    Game.run();
+
+    Game.destroy();
 }
