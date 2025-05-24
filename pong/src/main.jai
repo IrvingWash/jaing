@@ -24,7 +24,8 @@ Ball :: struct {
 Pallet :: struct {
     size: Vector2 = .{10, 100};
     position: Vector2;
-    velocity: Vector2 = .{0, 3000};
+    speed: float = 10;
+    velocity: Vector2 = .{0, 0};
 }
 
 // State
@@ -36,7 +37,7 @@ State :: struct {
 }
 
 state: State;
-DELTA_TIME :: 1.0 / 60.0;
+DUMMY_DELTA_TIME :: 1.0 / 60.0;
 
 // Controls
 Direction :: enum {
@@ -94,26 +95,36 @@ get_input :: () {
         if event.type == {
             case .QUIT;
                 state.should_quit = true;
-            case .KEYBOARD; if event.key_pressed {
-                if event.key_code == {
-                    case .ARROW_UP;
-                        move_pallet(*state.pallets[0], .Up);
-                    case .ARROW_DOWN;
-                        move_pallet(*state.pallets[0], .Down);
-                    case xx Key.W;
-                        move_pallet(*state.pallets[1], .Up);
-                    case xx Key.S;
-                        move_pallet(*state.pallets[1], .Down);
-                    case .SPACEBAR;
-                        state.ball.launched = true;
+            case .KEYBOARD;
+                if event.key_pressed {
+                    if event.key_code == {
+                        case .ARROW_UP;
+                            state.pallets[0].velocity = .{0, state.pallets[0].speed};
+                        case .ARROW_DOWN;
+                            state.pallets[0].velocity = .{0, -state.pallets[0].speed};
+                        case xx Key.W;
+                            state.pallets[1].velocity = .{0, state.pallets[1].speed};
+                        case xx Key.S;
+                            state.pallets[1].velocity = .{0, -state.pallets[1].speed};
+                        case .SPACEBAR;
+                            state.ball.launched = true;
+                    }
+                } else {
+                    if event.key_code == {
+                        case .ARROW_UP; #through;
+                        case .ARROW_DOWN;
+                            state.pallets[0].velocity = .{};
+                        case xx Key.W; #through;
+                        case xx Key.S;
+                            state.pallets[1].velocity = .{};
+                    }
                 }
-            }
-
         }
     }
 }
 
 simulate :: () {
+    move_pallets();
     move_ball();
 }
 
@@ -132,7 +143,7 @@ render :: () {
     );
 
     // Pallets
-    for pallet, i: state.pallets {
+    for pallet: state.pallets {
         Simp.immediate_quad(
             pallet.position.x,
             pallet.position.y,
@@ -156,13 +167,15 @@ render :: () {
     Simp.swap_buffers(state.window);
 }
 
-move_pallet :: (pallet: *Pallet, direction: Direction) {
-    if direction == .Up && pallet.position.y <= WINDOW_HEIGHT - pallet.size.y {
-        pallet.position += pallet.velocity * DELTA_TIME;
-    }
+move_pallets :: () {
+    for * pallet: state.pallets {
+        if pallet.velocity.y > 0 && pallet.position.y <= WINDOW_HEIGHT - pallet.size.y {
+            pallet.position += pallet.velocity * DUMMY_DELTA_TIME;
+        }
 
-    if direction == .Down && pallet.position.y >= 0 {
-        pallet.position -= pallet.velocity * DELTA_TIME;
+        if pallet.velocity.y < 0 && pallet.position.y >= 0 {
+            pallet.position += pallet.velocity * DUMMY_DELTA_TIME;
+        }
     }
 }
 
@@ -185,5 +198,5 @@ move_ball :: () {
         state.ball.velocity.x *= -1;
     }
 
-    state.ball.position += state.ball.velocity * DELTA_TIME;
+    state.ball.position += state.ball.velocity * DUMMY_DELTA_TIME;
 }
