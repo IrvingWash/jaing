@@ -1,24 +1,25 @@
 #import "Basic";
 
-Person :: struct (custom_age: u64) {
-    age := custom_age;
-    name: string;
-}
-
 main :: () {
-    man := Person(31).{name = "Man"};
+    Foo :: struct {
+        bar: u64;
+        baz: string;
+    }
 
-    person_age_up(*man);
+    foo: Foo;
 
-    print("%\n", man.age);
+    // Не скопирутеся, но синтаксис как будто просто по значение передаём.
+    // То же, что fn print_foo(foo: &Foo) в расте.
+    print_foo(foo);
 
-    print("%\n", add(5.23, 3.32));
+    // передаём поинтер чтобы иметь возможность мутировать
+    mutate_foo(*foo);
 }
 
-person_age_up :: (person: *Person) {
-    person.age += 1;
+print_foo :: (foo: Foo) {
+    print("%", foo);
 }
 
-add :: (a: $T, b: T) -> T {
-    return a + b;
+mutate_foo :: (foo: *Foo) {
+    foo.bar += 1;
 }
