@@ -9,7 +9,7 @@ bullet_spawn :: (player: Player) -> Bullet {
     bullet: Bullet;
 
     bullet.position = .{
-        x = player.position.x + player.size.x / 2 - 15,
+        x = player.position.x + player.size.x / 2 - bullet.size.x / 2,
         y = player.position.y,
     };
 

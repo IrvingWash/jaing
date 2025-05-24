@@ -27,8 +27,7 @@ player_update :: (player: *Player, dt: float, bullet_container: *[..]Bullet) {
             if event.key_code == .ARROW_RIGHT {
                 player.position.x += disposition;
             }
-            print("%\n", Input.input_button_states[13]);
-            if event.key_code == .ENTER && Input.input_button_states[13] == .END {
+            if event.key_code == .ENTER && Input.input_button_states[Input.Key_Code.ENTER] == .START | .DOWN {
                 array_add(bullet_container, bullet_spawn(player));
             }
         }
