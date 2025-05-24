@@ -26,6 +26,7 @@ Pallet :: struct {
     position: Vector2;
     speed: float = 10;
     velocity: Vector2;
+    score: u64;
 }
 
 // State
@@ -35,6 +36,10 @@ State :: struct {
     pallets: [2]Pallet;
     should_quit: bool;
 }
+
+// Assets
+font: *Simp.Dynamic_Font;
+FONT_SIZE :: WINDOW_HEIGHT / 24;
 
 state: State;
 DUMMY_DELTA_TIME :: 1.0 / 60.0;
@@ -48,11 +53,13 @@ Key :: enum {
 main :: () {
     init();
     run();
+    destroy();
 }
 
 init :: () {
     state.window = create_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Pong");
 
+    font = Simp.get_font_at_size("./assets", "OpenSans-BoldItalic.ttf", FONT_SIZE);
     Simp.set_render_target(state.window);
     Simp.set_shader_for_color(true);
 
@@ -75,11 +82,16 @@ init :: () {
     };
 }
 
+destroy :: () {
+    Simp.release_font(font);
+}
+
 run :: () {
     while !state.should_quit {
         get_input();
         simulate();
         render();
+        reset_temporary_storage();
     }
 }
 
@@ -121,6 +133,7 @@ get_input :: () {
 simulate :: () {
     move_pallets();
     move_ball();
+    update_score();
 }
 
 render :: () {
@@ -157,6 +170,18 @@ render :: () {
         BLUE,
     );
 
+    // Score
+    for pallet: state.pallets {
+        Simp.prepare_text(font, tprint("%", pallet.score));
+
+        Simp.draw_prepared_text(
+            font,
+            ifx it_index == 0 then 10 else WINDOW_WIDTH - 10 - FONT_SIZE,
+            10,
+            .{0, 0, 0, 1}
+        );
+    }
+
     Simp.immediate_flush();
 
     Simp.swap_buffers(state.window);
@@ -180,18 +205,33 @@ move_ball :: () {
     }
 
     // Collide with walls
-    if (
-        state.ball.position.y >= WINDOW_HEIGHT
-        || state.ball.position.y <= 0
-    ) {
+    hit_top_wall := state.ball.position.y >= WINDOW_HEIGHT;
+    hit_bottom_wall := state.ball.position.y <= 0;
+    if (hit_top_wall || hit_bottom_wall) {
         state.ball.velocity.y *= -1;
     }
-    if (
-        state.ball.position.x <= 0
-        || state.ball.position.x >= WINDOW_WIDTH
-    ) {
+
+    if test_ball_against_left_wall() || test_ball_against_right_wall() {
         state.ball.velocity.x *= -1;
     }
 
     state.ball.position += state.ball.velocity * DUMMY_DELTA_TIME;
+}
+
+update_score :: () {
+    if test_ball_against_left_wall() {
+        state.pallets[1].score += 1;
+    }
+
+    if test_ball_against_right_wall() {
+        state.pallets[0].score += 1;
+    }
+}
+
+test_ball_against_left_wall :: () -> bool {
+    return state.ball.position.x <= 0;
+}
+
+test_ball_against_right_wall :: () -> bool {
+    return state.ball.position.x >= WINDOW_WIDTH;
 }
