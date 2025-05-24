@@ -15,17 +15,21 @@ player_update :: (player: *Player, dt: float, bullet_container: *[..]Bullet) {
         if event.type == .KEYBOARD {
             disposition := player.speed * dt;
 
-            if event.key_code == {
-                case .ARROW_UP;
-                    player.position.y += disposition;
-                case .ARROW_DOWN;
-                    player.position.y -= disposition;
-                case .ARROW_LEFT;
-                    player.position.x -= disposition;
-                case .ARROW_RIGHT;
-                    player.position.x += disposition;
-                case .ENTER;
-                    array_add(bullet_container, .{position = player.position});
+            if event.key_code == .ARROW_UP {
+                player.position.y += disposition;
+            }
+            if event.key_code == .ARROW_DOWN {
+                player.position.y -= disposition;
+            }
+            if event.key_code == .ARROW_LEFT {
+                player.position.x -= disposition;
+            }
+            if event.key_code == .ARROW_RIGHT {
+                player.position.x += disposition;
+            }
+            print("%\n", Input.input_button_states[13]);
+            if event.key_code == .ENTER && Input.input_button_states[13] == .END {
+                array_add(bullet_container, bullet_spawn(player));
             }
         }
     }

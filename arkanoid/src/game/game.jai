@@ -82,8 +82,8 @@ render :: () {
         Simp.immediate_quad(
             it.position.x,
             it.position.y,
-            it.position.x + game.player.size.x,
-            it.position.y + game.player.size.y,
+            it.position.x + it.size.x,
+            it.position.y + it.size.y,
             it.color
         );
     }

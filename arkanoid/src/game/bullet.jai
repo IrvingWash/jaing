@@ -1,8 +1,19 @@
 Bullet :: struct {
     position: Vector2;
-    size: Vector2 = .{10, 10};
-    speed: float = 100;
+    size: Vector2 = .{30, 30};
+    speed: float = 10;
     color: Vector4 = .{255, 0, 0, 255};
+}
+
+bullet_spawn :: (player: Player) -> Bullet {
+    bullet: Bullet;
+
+    bullet.position = .{
+        x = player.position.x + player.size.x / 2 - 15,
+        y = player.position.y,
+    };
+
+    return bullet;
 }
 
 bullet_update :: (bullet: *Bullet, dt: float) {
