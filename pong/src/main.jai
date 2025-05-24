@@ -5,6 +5,9 @@ Simp :: #import "Simp";
 Input :: #import "Input";
 #import "Random";
 
+#load "ball.jai";
+#load "pallet.jai";
+
 // Colors
 WHITE :: Vector4.{1, 1, 1, 1};
 BLUE :: Vector4.{0, 0, 1, 1};
@@ -13,22 +16,6 @@ RED :: Vector4.{1, 0, 0, 1};
 // Window
 WINDOW_WIDTH :: 800;
 WINDOW_HEIGHT :: 600;
-
-// Entities
-Ball :: struct {
-    size: float = 15;
-    position: Vector2;
-    velocity: Vector2;
-    speed: float = 7;
-}
-
-Pallet :: struct {
-    size: Vector2 = .{15, 100};
-    position: Vector2;
-    speed: float = 7;
-    velocity: Vector2;
-    score: u64;
-}
 
 // State
 State :: struct {
@@ -107,13 +94,13 @@ get_input :: () {
                 if event.key_pressed {
                     if event.key_code == {
                         case .ARROW_UP;
-                            state.pallets[0].velocity = .{0, state.pallets[0].speed};
+                            state.pallets[1].velocity = .{0, state.pallets[0].speed};
                         case .ARROW_DOWN;
-                            state.pallets[0].velocity = .{0, -state.pallets[0].speed};
+                            state.pallets[1].velocity = .{0, -state.pallets[0].speed};
                         case xx Key.W;
-                            state.pallets[1].velocity = .{0, state.pallets[1].speed};
+                            state.pallets[0].velocity = .{0, state.pallets[1].speed};
                         case xx Key.S;
-                            state.pallets[1].velocity = .{0, -state.pallets[1].speed};
+                            state.pallets[0].velocity = .{0, -state.pallets[1].speed};
                         case .SPACEBAR;
                             launch_ball();
                     }
@@ -121,10 +108,10 @@ get_input :: () {
                     if event.key_code == {
                         case .ARROW_UP; #through;
                         case .ARROW_DOWN;
-                            state.pallets[0].velocity = .{};
+                            state.pallets[1].velocity = .{};
                         case xx Key.W; #through;
                         case xx Key.S;
-                            state.pallets[1].velocity = .{};
+                            state.pallets[0].velocity = .{};
                     }
                 }
         }
@@ -188,49 +175,6 @@ render :: () {
     Simp.swap_buffers(state.window);
 }
 
-move_pallets :: () {
-    for * pallet: state.pallets {
-        if pallet.velocity.y > 0 && pallet.position.y <= WINDOW_HEIGHT - pallet.size.y {
-            pallet.position += pallet.velocity * DUMMY_DELTA_TIME;
-        }
-
-        if pallet.velocity.y < 0 && pallet.position.y >= 0 {
-            pallet.position += pallet.velocity * DUMMY_DELTA_TIME;
-        }
-    }
-}
-
-move_ball :: () {
-    // Collide with pallets
-    for pallet: state.pallets {
-        if (
-            pallet.position.x < state.ball.position.x + state.ball.size
-            && pallet.position.x + pallet.size.x > state.ball.position.x
-            && pallet.position.y < state.ball.position.y + state.ball.size
-            && pallet.position.y + pallet.size.y > state.ball.position.y
-        ) {
-            state.ball.position.x = ifx it_index == 0 {
-                pallet.position.x + pallet.size.x + 1;
-            } else {
-                pallet.position.x - 1 - state.ball.size;
-            }
-            state.ball.velocity.x *= -1;
-        }
-    }
-
-    // Collide with walls
-    hit_top_wall := state.ball.position.y >= WINDOW_HEIGHT;
-    hit_bottom_wall := state.ball.position.y <= 0;
-    if (hit_top_wall || hit_bottom_wall) {
-        state.ball.velocity.y *= -1;
-    }
-    if test_ball_against_left_wall() || test_ball_against_right_wall() {
-        state.ball.velocity.x *= -1;
-    }
-
-    state.ball.position += state.ball.velocity * DUMMY_DELTA_TIME;
-}
-
 update_score :: () {
     if test_ball_against_left_wall() {
         state.pallets[1].score += 1;
@@ -239,21 +183,4 @@ update_score :: () {
     if test_ball_against_right_wall() {
         state.pallets[0].score += 1;
     }
-}
-
-launch_ball :: () {
-    random_seed(current_time_monotonic().low);
-
-    state.ball.velocity = .{
-        state.ball.speed * ifx random_get_zero_to_one() > 0.5 then -1 else 1,
-        state.ball.speed * ifx random_get_zero_to_one() > 0.5 then -1 else 1,
-    };
-}
-
-test_ball_against_left_wall :: () -> bool {
-    return state.ball.position.x <= 0;
-}
-
-test_ball_against_right_wall :: () -> bool {
-    return state.ball.position.x >= WINDOW_WIDTH;
 }
