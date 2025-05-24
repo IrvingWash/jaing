@@ -25,7 +25,7 @@ Pallet :: struct {
     size: Vector2 = .{10, 100};
     position: Vector2;
     speed: float = 10;
-    velocity: Vector2 = .{0, 0};
+    velocity: Vector2;
 }
 
 // State
@@ -40,11 +40,6 @@ state: State;
 DUMMY_DELTA_TIME :: 1.0 / 60.0;
 
 // Controls
-Direction :: enum {
-    Up;
-    Down;
-}
-
 Key :: enum {
     S :: 83;
     W :: 87;
