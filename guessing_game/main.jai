@@ -44,7 +44,7 @@ run :: () {
 }
 
 state_init :: () -> State {
-    Random.random_seed(Basic.current_time_monotonic().low);
+    Random.random_seed(cast,force(Random.Some_Big_Time_Value) Basic.current_time_monotonic());
 
     return .{
         target = xx Random.random_get_within_range(1, 100),

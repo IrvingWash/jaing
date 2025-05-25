@@ -6,7 +6,7 @@ Ball :: struct {
 }
 
 launch_ball :: () {
-    random_seed(current_time_monotonic().low);
+    random_seed(cast,force(Some_Big_Time_Value) current_time_monotonic());
 
     state.ball.velocity = .{
         state.ball.speed * ifx random_get_zero_to_one() > 0.5 then -1 else 1,
