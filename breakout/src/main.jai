@@ -6,12 +6,17 @@ Input :: #import "Input";
 
 #import,file "paddle.jai";
 #import,file "ball.jai";
+#import,file "brick.jai";
 
 WINDOW_WIDTH :: 800;
 WINDOW_HEIGHT :: 600;
 TARGET_FPS :: 60;
 TARGET_DELTA_TIME: float : 1.0 / TARGET_FPS;
 MAX_DELTA_TIME :: TARGET_DELTA_TIME * 2.0;
+BRICK_COLUMNS :: 10;
+BRICK_ROWS :: 5;
+BRICK_WIDTH :: WINDOW_WIDTH / BRICK_COLUMNS;
+BRICK_HEIGHT :: 100 / BRICK_ROWS;
 
 State :: struct {
     is_running: bool;
@@ -19,6 +24,7 @@ State :: struct {
     last_time: float64;
     paddle: *Paddle;
     ball: *Ball;
+    bricks: [..]*Brick;
 }
 
 state: State = ---;
@@ -44,6 +50,18 @@ setup :: () {
 
     state.paddle.* = paddle_init(WINDOW_WIDTH);
     state.ball.* = ball_init(state.paddle, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    for i: 0..BRICK_COLUMNS - 1 {
+        for j: 0..BRICK_ROWS - 1 {
+            brick := New(Brick);
+            brick.* = brick_init(
+                .{xx (i * BRICK_WIDTH), xx (WINDOW_HEIGHT - j * BRICK_HEIGHT - 30)},
+                .{xx BRICK_WIDTH, xx BRICK_HEIGHT}
+            );
+
+            array_add(*state.bricks, brick);
+        }
+    }
 }
 
 run :: () {
@@ -57,6 +75,7 @@ run :: () {
 }
 
 destroy :: () {
+    array_free(state.bricks);
     free(state.ball);
     free(state.paddle);
 }
@@ -100,6 +119,10 @@ render :: () {
 
     paddle_draw(state.paddle);
     ball_draw(state.ball);
+
+    for brick: state.bricks {
+        brick_draw(brick);
+    }
 
     Simp.immediate_flush();
     Simp.swap_buffers(state.window);
