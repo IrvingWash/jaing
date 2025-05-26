@@ -1,7 +1,7 @@
 Pallet :: struct {
     size: Vector2 = .{15, 80};
     position: Vector2;
-    speed: float = 200;
+    speed: float = 400;
     velocity: Vector2;
     score: u64;
 }

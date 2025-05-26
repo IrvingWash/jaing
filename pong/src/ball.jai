@@ -2,7 +2,7 @@ Ball :: struct {
     size: float = 15;
     position: Vector2;
     velocity: Vector2;
-    speed: float = 300;
+    speed: float = 500;
 }
 
 launch_ball :: () {
