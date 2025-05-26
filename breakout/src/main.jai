@@ -5,6 +5,7 @@ Simp :: #import "Simp";
 Input :: #import "Input";
 
 #import,file "paddle.jai";
+#import,file "ball.jai";
 
 WINDOW_WIDTH :: 800;
 WINDOW_HEIGHT :: 600;
@@ -17,6 +18,7 @@ State :: struct {
     window: Window_Type;
     last_time: float64;
     paddle: *Paddle;
+    ball: *Ball;
 }
 
 state: State = ---;
@@ -37,9 +39,11 @@ setup :: () {
         window = window,
         last_time = seconds_since_init(),
         paddle = New(Paddle),
+        ball = New(Ball),
     };
 
     state.paddle.* = paddle_init(WINDOW_WIDTH);
+    state.ball.* = ball_init(state.paddle, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 run :: () {
@@ -53,6 +57,7 @@ run :: () {
 }
 
 destroy :: () {
+    free(state.ball);
     free(state.paddle);
 }
 
@@ -86,6 +91,7 @@ get_input :: () {
 
 update :: (dt: float) {
     paddle_update(state.paddle, dt);
+    ball_update(state.ball, state.paddle, dt);
 }
 
 render :: () {
@@ -93,6 +99,7 @@ render :: () {
     Simp.immediate_begin();
 
     paddle_draw(state.paddle);
+    ball_draw(state.ball);
 
     Simp.immediate_flush();
     Simp.swap_buffers(state.window);

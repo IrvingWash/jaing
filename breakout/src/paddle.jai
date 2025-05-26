@@ -12,7 +12,7 @@ PADDLE_SIZE :: Vector2.{100, 20};
 Paddle :: struct {
     using position: Vector2;
     size: Vector2;
-    speed: float = 300;
+    speed: float = 500;
     velocity: Vector2;
     pg_width: u32;
 }
@@ -62,6 +62,7 @@ paddle_draw :: (paddle: Paddle) {
 }
 
 #scope_file
+
 paddle_move :: (paddle: *Paddle, dt: float) {
     using paddle;
 
