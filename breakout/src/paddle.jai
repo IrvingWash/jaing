@@ -12,7 +12,7 @@ PADDLE_SIZE :: Vector2.{100, 20};
 Paddle :: struct {
     using position: Vector2;
     size: Vector2;
-    speed: float = 500;
+    speed: float = 700;
     velocity: Vector2;
     pg_width: u32;
 }
