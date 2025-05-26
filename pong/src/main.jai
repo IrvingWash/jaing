@@ -28,7 +28,8 @@ Key :: enum {
 }
 
 // FPS
-MAX_DELTA_TIME :: 0.32;
+TARGET_DELTA_TIME: float : 1.0 / 60.0;
+MAX_DELTA_TIME: float : TARGET_DELTA_TIME * 2.0;
 
 // State
 State :: struct {
@@ -81,18 +82,26 @@ destroy :: () {
 
 run :: () {
     while !state.should_quit {
-        now := seconds_since_init();
-        dt := now - state.last_time;
-        if dt > MAX_DELTA_TIME {
-            dt = MAX_DELTA_TIME;
-        }
-        state.last_time = now;
+        dt := cap_frame_rate();
 
         get_input();
         simulate(dt);
         render();
         reset_temporary_storage();
     }
+}
+
+cap_frame_rate :: () -> float {
+    time_to_wait := TARGET_DELTA_TIME - (seconds_since_init() - state.last_time);
+    if time_to_wait > 0 && time_to_wait <= TARGET_DELTA_TIME {
+        sleep_milliseconds(cast(s32) (time_to_wait * 1000.0));
+    }
+
+    now := seconds_since_init();
+    dt := now - state.last_time;
+    state.last_time = now;
+
+    return xx dt;
 }
 
 get_input :: () {
