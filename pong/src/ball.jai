@@ -22,7 +22,7 @@ test_ball_against_right_wall :: () -> bool {
     return state.ball.position.x >= WINDOW_WIDTH;
 }
 
-move_ball :: () {
+move_ball :: (delta_time: float64) {
     // Collide with pallets
     for pallet: state.pallets {
         if (
@@ -50,5 +50,5 @@ move_ball :: () {
         state.ball.velocity.x *= -1;
     }
 
-    state.ball.position += state.ball.velocity * DUMMY_DELTA_TIME;
+    state.ball.position += state.ball.velocity * cast(float) delta_time;
 }

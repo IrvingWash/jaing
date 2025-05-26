@@ -17,26 +17,29 @@ RED :: Vector4.{1, 0, 0, 1};
 WINDOW_WIDTH :: 800;
 WINDOW_HEIGHT :: 600;
 
-// State
-State :: struct {
-    window: Window_Type;
-    ball: Ball;
-    pallets: [2]Pallet;
-    should_quit: bool;
-}
-
 // Assets
 font: *Simp.Dynamic_Font;
 FONT_SIZE :: WINDOW_HEIGHT / 24;
-
-state: State;
-DUMMY_DELTA_TIME :: 1.0 / 60.0;
 
 // Controls
 Key :: enum {
     S :: 83;
     W :: 87;
 }
+
+// FPS
+MAX_DELTA_TIME :: 0.32;
+
+// State
+State :: struct {
+    window: Window_Type;
+    ball: Ball;
+    pallets: [2]Pallet;
+    should_quit: bool;
+    last_time: float64;
+}
+
+state: State;
 
 main :: () {
     init();
@@ -68,6 +71,8 @@ init :: () {
         WINDOW_WIDTH - state.pallets[1].size.x,
         WINDOW_HEIGHT / 2 - state.pallets[1].size.y / 2,
     };
+
+    state.last_time = seconds_since_init();
 }
 
 destroy :: () {
@@ -76,8 +81,15 @@ destroy :: () {
 
 run :: () {
     while !state.should_quit {
+        now := seconds_since_init();
+        dt := now - state.last_time;
+        if dt > MAX_DELTA_TIME {
+            dt = MAX_DELTA_TIME;
+        }
+        state.last_time = now;
+
         get_input();
-        simulate();
+        simulate(dt);
         render();
         reset_temporary_storage();
     }
@@ -118,9 +130,9 @@ get_input :: () {
     }
 }
 
-simulate :: () {
-    move_pallets();
-    move_ball();
+simulate :: (delta_time: float64) {
+    move_pallets(delta_time);
+    move_ball(delta_time);
     update_score();
 }
 
