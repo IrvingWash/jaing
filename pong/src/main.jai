@@ -28,7 +28,8 @@ Key :: enum {
 }
 
 // FPS
-TARGET_DELTA_TIME: float : 1.0 / 60.0;
+TARGET_FPS :: 60;
+TARGET_DELTA_TIME: float : 1.0 / TARGET_FPS;
 MAX_DELTA_TIME: float : TARGET_DELTA_TIME * 2.0;
 
 // State
@@ -86,7 +87,7 @@ run :: () {
 
         get_input();
         simulate(dt);
-        render();
+        render(dt);
         reset_temporary_storage();
     }
 }
@@ -145,7 +146,7 @@ simulate :: (delta_time: float64) {
     update_score();
 }
 
-render :: () {
+render :: (dt: float) {
     Simp.clear_render_target(WHITE.x, WHITE.y, WHITE.z, WHITE.w);
 
     Simp.immediate_begin();
@@ -190,6 +191,16 @@ render :: () {
             .{0, 0, 0, 1}
         );
     }
+
+    // FPS
+    width := Simp.prepare_text(font, tprint("FPS: %", cast(u32) (1 / dt)));
+    Simp.draw_prepared_text(
+        font,
+        WINDOW_WIDTH / 2 - width / 2,
+        WINDOW_HEIGHT - 30,
+        .{0, 0, 0, 1}
+    );
+
 
     Simp.immediate_flush();
 
