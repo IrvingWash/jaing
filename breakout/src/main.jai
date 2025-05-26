@@ -111,6 +111,10 @@ get_input :: () {
 update :: (dt: float) {
     paddle_update(state.paddle, dt);
     ball_update(state.ball, state.paddle, dt);
+
+    for brick: state.bricks {
+        brick_update(brick, state.ball);
+    }
 }
 
 render :: () {
