@@ -28,3 +28,11 @@ square :: ($$number: $T) -> T
 
     return do_square(number);
 }
+
+println :: (format_string: string, args: .. Any) {
+    builder: String_Builder;
+    print(*builder, format_string, ..args);
+    s := builder_to_string(*builder);
+
+    write_strings(s, "\n");
+}
