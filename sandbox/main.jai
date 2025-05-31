@@ -1,17 +1,20 @@
 #import "Basic";
 
+#no_reset some_glob := 0;
+
 main :: () {
     print("%\n", square(3.5));
     print("%\n", square(3.5));
     print("%\n", square(2));
     print("%\n", square(3.5));
+    #if false print("%\n", square("Sailor"));
 }
 
 square :: ($$number: $T) -> T
 #modify {
     ti := cast(*Type_Info) T;
 
-    return ifx ti.type != .INTEGER || ti.type != .FLOAT;
+    return ti.type == .INTEGER || ti.type == .FLOAT, "T should be a number";
 }
 {
     do_square :: x => x * x;
