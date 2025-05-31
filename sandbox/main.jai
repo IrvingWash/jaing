@@ -2,6 +2,8 @@
 
 #no_reset some_glob := 0;
 
+// TODO: Try Bucket_Array
+
 main :: () {
     print("%\n", square(3.5));
     print("%\n", square(3.5));
