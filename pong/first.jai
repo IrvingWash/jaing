@@ -14,7 +14,7 @@ Args :: struct {
     is_release: bool;
 }
 
-#run {
+#run,stallable {
     Compiler.set_build_options_dc(.{ do_output = false });
 
     args := args_init();
@@ -25,10 +25,6 @@ Args :: struct {
 
     if args.should_build {
         build(args);
-    }
-
-    if args.should_run {
-        run(args);
     }
 
     reset_temporary_storage();
@@ -89,21 +85,34 @@ build :: (args: Args) {
     Compiler.set_build_options(options, w);
 
     Compiler.add_build_file("src/main.jai", w);
+
+    // Emits `autorun` variable.
+    init_autorun_if_needed(args, w);
+    if autorun {
+        autorun.shutdown(autorun);
+    }
 }
 
-run :: (args: Args) {
-    if args.is_debug {
-        Process.run_command(tprint("./%/%", DEBUG_BUILD_DIR, EXECUTABLE_NAME));
-        return;
+init_autorun_if_needed :: (args: Args, w: Workspace) #expand {
+    Metaprogram_Plugins :: #import "Metaprogram_Plugins";
+
+    plugins: [..]*Compiler.Metaprogram_Plugin;
+    plugins.allocator = temp;
+    plugins_to_create: [..]Metaprogram_Plugins.Plugin_To_Create;
+    plugins_to_create.allocator = temp;
+    
+    if args.should_run {
+        array_add(*plugins_to_create, .{name = "Autorun"});
     }
 
-    if args.is_release {
-        Process.run_command(tprint("./%/%", RELEASE_BUILD_DIR, EXECUTABLE_NAME));
-        return;
+    Metaprogram_Plugins.init_plugins(plugins_to_create, *plugins, w);
+
+    `autorun: *Compiler.Metaprogram_Plugin;
+    if plugins.count > 0 {
+        autorun = plugins[0];
     }
 }
 
 using,only(compiler_report, compiler_create_workspace) Compiler :: #import "Compiler";
 #import "Basic";
 File :: #import "File";
-Process :: #import "Process";
