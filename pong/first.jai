@@ -86,14 +86,13 @@ build :: (args: Args) {
 
     Compiler.add_build_file("src/main.jai", w);
 
-    // Emits `autorun` variable.
-    init_autorun_if_needed(args, w);
+    autorun := init_autorun_if_needed(args, w);
     if autorun {
         autorun.shutdown(autorun);
     }
 }
 
-init_autorun_if_needed :: (args: Args, w: Workspace) #expand {
+init_autorun_if_needed :: (args: Args, w: Workspace) -> autorun: *Compiler.Metaprogram_Plugin {
     Metaprogram_Plugins :: #import "Metaprogram_Plugins";
 
     plugins: [..]*Compiler.Metaprogram_Plugin;
@@ -107,10 +106,11 @@ init_autorun_if_needed :: (args: Args, w: Workspace) #expand {
 
     Metaprogram_Plugins.init_plugins(plugins_to_create, *plugins, w);
 
-    `autorun: *Compiler.Metaprogram_Plugin;
     if plugins.count > 0 {
-        autorun = plugins[0];
+        return plugins[0];
     }
+
+    return null;
 }
 
 using,only(compiler_report, compiler_create_workspace) Compiler :: #import "Compiler";
